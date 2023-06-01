@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
-import "../node_modules/hardhat/console.sol";
-
 contract Pool is ERC20 {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
@@ -48,7 +46,10 @@ contract Pool is ERC20 {
             _mint(address(this), MINIMUM_LIQUIDITY);
         } else {
             // Otherwise we determine the reward as stored rate
-            liquidity = Math.min(tokenAmount0_.mul(totalSupply).div(amount0), tokenAmount1_.mul(totalSupply).div(amount1));
+            liquidity = Math.min(
+                tokenAmount0_.mul(totalSupply).div(amount0), 
+                tokenAmount1_.mul(totalSupply).div(amount1)
+            );
         }
         
         // Update K

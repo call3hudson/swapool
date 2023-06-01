@@ -21,7 +21,6 @@ describe('Pool', function () {
   const v500 = parseUnits('500', 18);
   const v250 = parseUnits('250', 18);
   const v125 = parseUnits('125', 18);
-  const v50 = parseUnits('10', 18);
 
   beforeEach(async () => {
     [owner, lp0, lp1, user0, user1] = await ethers.getSigners();

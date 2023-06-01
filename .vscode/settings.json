@@ -1,9 +1,13 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
+  "notebook.formatOnSave.enabled": true,
+  "eslint.codeActionsOnSave.rules": null,
   "[javascript]": {
     "editor.formatOnSave": true
   },
-  "notebook.formatOnSave.enabled": true,
-  "eslint.codeActionsOnSave.rules": null
+  "[solidity]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
