@@ -147,9 +147,12 @@ describe('Pool', function () {
       await expect(pool.connect(user0).swap(v100000, 0)).to.revertedWith(
         'Invalid amount : Insufficient token'
       );
+      await expect(pool.connect(user0).swap(0, v100000)).to.revertedWith(
+        'Invalid amount : Insufficient token'
+      );
     });
 
-    it('Sample swap', async () => {
+    it('Sample swap from token0 to token1', async () => {
       await dai.connect(lp0).approve(pool.address, v1000);
       await usdt.connect(lp0).approve(pool.address, v250);
       await pool.connect(lp0).addLiquidity(v1000, v250); // Rate's set as 4:1
@@ -159,6 +162,18 @@ describe('Pool', function () {
 
       expect(await dai.balanceOf(user0.address)).to.equal(v10000.sub(v1000));
       expect(await usdt.balanceOf(user0.address)).to.equal(v10000.add(v125));
+    });
+
+    it('Sample swap from token1 to token0', async () => {
+      await dai.connect(lp0).approve(pool.address, v1000);
+      await usdt.connect(lp0).approve(pool.address, v250);
+      await pool.connect(lp0).addLiquidity(v1000, v250); // Rate's set as 4:1
+
+      await usdt.connect(user0).approve(pool.address, v250);
+      await pool.connect(user0).swap(0, v250);
+
+      expect(await dai.balanceOf(user0.address)).to.equal(v10000.add(v500));
+      expect(await usdt.balanceOf(user0.address)).to.equal(v10000.sub(v250));
     });
   });
 });
