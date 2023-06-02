@@ -13,7 +13,7 @@ describe('Dai', function () {
     [owner, user] = await ethers.getSigners();
 
     const Dai: Dai__factory = (await ethers.getContractFactory('Dai', owner)) as Dai__factory;
-    dai = await Dai.connect(owner).deploy();
+    dai = await Dai.connect(owner).deploy('Test Dai', 'TDA');
     await dai.deployed();
   });
 

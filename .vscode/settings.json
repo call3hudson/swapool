@@ -1,13 +1,13 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "notebook.formatOnSave.enabled": true,
   "eslint.codeActionsOnSave.rules": null,
-  "[javascript]": {
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  "[solidity]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "solidity.enabledAsYouTypeCompilationErrorCheck": true,
+  "solidity.validationDelay": 1500,
+  "solidity.enabledSolhint": true,
+  "solidity.solhintRules": {}
 }
