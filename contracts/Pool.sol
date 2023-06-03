@@ -3,13 +3,11 @@ pragma solidity 0.8.19;
 
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/utils/math/Math.sol';
 import '../node_modules/hardhat/console.sol';
 
 contract Pool is ERC20 {
   using SafeERC20 for IERC20;
-  using SafeMath for uint;
 
   uint256 public constant MINIMUM_LIQUIDITY = 1e3;
 
@@ -51,19 +49,17 @@ contract Pool is ERC20 {
     uint256 liquidity;
     if (totalSupply == 0) {
       // If it's the first liquidity provider
-      liquidity = Math.sqrt(tokenAmount0_.mul(tokenAmount1_)).sub(MINIMUM_LIQUIDITY);
+      liquidity = Math.sqrt(tokenAmount0_ * tokenAmount1_) - MINIMUM_LIQUIDITY;
       (amount0Needed, amount1Needed) = (tokenAmount0_, tokenAmount1_);
       _mint(address(this), MINIMUM_LIQUIDITY);
     } else {
       // Otherwise we determine the reward as stored rate
-      if (
-        tokenAmount0_.mul(totalSupply).div(amount0) <= tokenAmount1_.mul(totalSupply).div(amount1)
-      ) {
-        liquidity = tokenAmount0_.mul(totalSupply).div(amount0);
-        (amount0Needed, amount1Needed) = (tokenAmount0_, liquidity.mul(amount1).div(totalSupply));
+      if (((tokenAmount0_ * totalSupply) / amount0) <= ((tokenAmount1_ * totalSupply) / amount1)) {
+        liquidity = (tokenAmount0_ * totalSupply) / amount0;
+        (amount0Needed, amount1Needed) = (tokenAmount0_, (liquidity * amount1) / totalSupply);
       } else {
-        liquidity = tokenAmount1_.mul(totalSupply).div(amount1);
-        (amount0Needed, amount1Needed) = (liquidity.mul(amount0).div(totalSupply), tokenAmount1_);
+        liquidity = (tokenAmount1_ * totalSupply) / amount1;
+        (amount0Needed, amount1Needed) = ((liquidity * amount0) / totalSupply, tokenAmount1_);
       }
     }
 
@@ -77,7 +73,7 @@ contract Pool is ERC20 {
     token1.safeTransferFrom(msg.sender, address(this), amount1Needed);
 
     // Update K
-    k = amount0.add(amount0Needed).mul(amount1.add(amount1Needed));
+    k = (amount0 + amount0Needed) * (amount1 + amount1Needed);
 
     // Finally mint corresponding amount of liquidity to provider
     _mint(msg.sender, liquidity);
@@ -100,8 +96,8 @@ contract Pool is ERC20 {
     uint256 totalAmount1 = token1.balanceOf(address(this));
 
     // Calculate corresponding amounts respectively
-    uint256 tokenAmount0 = liquidity_.mul(totalAmount0).div(totalSupply);
-    uint256 tokenAmount1 = liquidity_.mul(totalAmount1).div(totalSupply);
+    uint256 tokenAmount0 = (liquidity_ * totalAmount0) / totalSupply;
+    uint256 tokenAmount1 = (liquidity_ * totalAmount1) / totalSupply;
 
     require(
       tokenAmount0 >= tokenMinimum0_ && tokenAmount1 >= tokenMinimum1_,
@@ -115,7 +111,7 @@ contract Pool is ERC20 {
     token1.safeTransfer(msg.sender, tokenAmount1);
 
     // Update K as well
-    k = totalAmount0.sub(tokenAmount0).mul(totalAmount1.sub(tokenAmount1));
+    k = (totalAmount0 - tokenAmount0) * (totalAmount1 - tokenAmount1);
 
     emit LiquidityRefunded(msg.sender, liquidity_, tokenAmount0, tokenAmount1);
   }
@@ -134,14 +130,14 @@ contract Pool is ERC20 {
     uint256 totalSupply1 = destToken.balanceOf(address(this));
 
     // Keeping the former value of K, calculate amount of token B to be swapped
-    uint256 swapAmount = totalSupply1.sub(k.div(totalSupply0.add(tokenAmount_)));
+    uint256 swapAmount = totalSupply1 - k / (totalSupply0 + tokenAmount_);
     require(swapAmount >= tokenMinimum_, 'Reverted : Minimum desired amount exceeds');
 
     srcToken.safeTransferFrom(msg.sender, address(this), tokenAmount_);
     destToken.safeTransfer(msg.sender, swapAmount);
 
     // Consider the truncation division
-    k = totalSupply0.add(tokenAmount_).mul(totalSupply1.sub(swapAmount));
+    k = (totalSupply0 + tokenAmount_) * (totalSupply1 - swapAmount);
 
     emit Swapped(msg.sender, tokenAmount_, swapAmount);
   }
