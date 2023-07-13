@@ -1,13 +1,18 @@
-# Sample Hardhat Project
+# Swapool
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+```
+1. initialize with 2 tokens.
+2. add/remove liquidity functions.
+when adding liquidity, mint LP token, and when removing liquidity, burn LP token.
+3. swap
+able to swap ERC20 token to ERC20 token, or ETH to ERC20 token, or ERC20 token to ETH
+```
+
+This project demonstrates a basic Vault(Not EIP4626).
 
 Try running some of the following tasks:
 
 ```shell
-npx hardhat help
 npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
+npx hardhat coverage
 ```
